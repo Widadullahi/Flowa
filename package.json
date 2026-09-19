@@ -1,0 +1,37 @@
+{
+  "name": "flowa",
+  "version": "1.0.0",
+  "description": "FLOWA - AI commerce operations layer for WhatsApp businesses",
+  "private": true,
+  "type": "module",
+  "bun": {
+    "workspaces": ["packages/*"]
+  },
+  "scripts": {
+    "dev": "bun run dev --filter=landing",
+    "dev:all": "bun run dev:all",
+    "api": "cd packages/api && source .venv/bin/activate && python app.py",
+    "landing": "cd packages/landing && bun run dev",
+    "dev:concurrent": "concurrently 'npm run api' 'npm run landing'",
+    "build": "bun run build --filter=landing",
+    "build:landing": "cd packages/landing && bun run build",
+    "preview": "cd packages/landing && bun run preview",
+    "lint": "bun run lint",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "prettier": "^3.0.0"
+  },
+  "keywords": [
+    "whatsapp",
+    "ai",
+    "commerce",
+    "orders",
+    "payments"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "bun": ">=1.1.0"
+  }
+}

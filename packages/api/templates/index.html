@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flowa MVP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <div class="brand-mark">F</div>
+          <div>
+            <div class="brand-name">Flowa</div>
+            <div class="brand-tag">From conversation to completion</div>
+          </div>
+        </div>
+        <div class="top-pills">
+          <span class="chip success">WhatsApp-first</span>
+          <span class="chip neutral">AI + Paystack-ready</span>
+        </div>
+      </header>
+
+      <section class="stats-row">
+        <div class="stat-card accent">
+          <label>Businesses</label>
+          <strong>{{ summary.total_businesses }}</strong>
+        </div>
+        <div class="stat-card">
+          <label>Active leads</label>
+          <strong>{{ summary.active_leads }}</strong>
+        </div>
+        <div class="stat-card">
+          <label>Paid</label>
+          <strong>{{ summary.paid_leads }}</strong>
+        </div>
+        <div class="stat-card">
+          <label>Pending</label>
+          <strong>{{ summary.total_businesses + summary.active_leads - summary.paid_leads }}</strong>
+        </div>
+      </section>
+
+      <section class="main-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Business onboarding</h2>
+            <span class="chip neutral">On WhatsApp</span>
+          </div>
+
+          <form id="onboardingForm" class="stack-form">
+            <div class="two-col">
+              <label>
+                Business name
+                <input type="text" name="business_name" value="Sweet Crumb Cakes" required />
+              </label>
+              <label>
+                Owner name
+                <input type="text" name="owner_name" value="Tola Adeyemi" />
+              </label>
+            </div>
+
+            <div class="two-col">
+              <label>
+                Category
+                <input type="text" name="category" value="Baker" />
+              </label>
+              <label>
+                Service type
+                <select name="service_type">
+                  <option value="Product seller">Product seller</option>
+                  <option value="Service provider">Service provider</option>
+                  <option value="Hybrid">Hybrid</option>
+                </select>
+              </label>
+            </div>
+
+            <label>
+              What do you do?
+              <input type="text" name="what_they_do" value="Custom cakes, cupcakes, and dessert boxes" />
+            </label>
+
+            <label>
+              Business description
+              <textarea name="business_description" rows="3">Premium custom cakes and gift boxes for birthdays and events.</textarea>
+            </label>
+
+            <div class="two-col">
+              <label>
+                Pricing
+                <input type="text" name="pricing" value="₦25,000+ depending on size and design" />
+              </label>
+              <label>
+                WhatsApp number
+                <input type="text" name="whatsapp_number" value="+2348123456789" />
+              </label>
+            </div>
+
+            <div class="two-col">
+              <label>
+                Location
+                <input type="text" name="location" value="Lekki, Lagos" />
+              </label>
+              <label>
+                Payment mode
+                <input type="text" name="payment_mode" value="Paystack + Transfer" />
+              </label>
+            </div>
+
+            <div class="two-col">
+              <label>
+                Bank name
+                <input type="text" name="bank_name" value="Access Bank" />
+              </label>
+              <label>
+                Account number
+                <input type="text" name="account_number" value="0123456789" />
+              </label>
+            </div>
+
+            <label>
+              Account name
+              <input type="text" name="account_name" value="Sweet Crumb Cakes" />
+            </label>
+
+            <label class="checkbox-row">
+              <input type="checkbox" name="accepts_deposit" checked />
+              Accepts deposit
+            </label>
+
+            <button type="submit" class="primary-btn">Save business</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Customer AI chat</h2>
+            <span class="chip success">Demo</span>
+          </div>
+
+          <div class="stack-form">
+            <label>
+              Business
+              <select id="businessSelect">
+                {% for business in businesses %}
+                <option value="{{ business.id }}">{{ business.business_name }}</option>
+                {% endfor %}
+              </select>
+            </label>
+
+            <label>
+              Customer name
+              <input id="customerName" type="text" value="Tolu" />
+            </label>
+
+            <label>
+              Customer phone
+              <input id="customerPhone" type="text" value="+2348012345678" />
+            </label>
+
+            <label>
+              Message
+              <textarea id="customerMessage" rows="5">Hi, I want a 10-inch chocolate cake for Saturday. Please send your account details.</textarea>
+            </label>
+
+            <button id="sendChatBtn" class="primary-btn">Send to AI</button>
+            <div id="chatResponse" class="chat-response empty">AI response will appear here.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel report-panel">
+        <div class="panel-header">
+          <h2>Summary report</h2>
+          <a href="/api/reports/export" class="download-link">Download CSV</a>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Business</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Payment</th>
+                <th>Next action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for lead in leads %}
+              <tr>
+                <td>{{ lead.business_id }}</td>
+                <td>{{ lead.customer_name }}</td>
+                <td>{{ lead.product_or_service }}</td>
+                <td>₦{{ '{:,.0f}'.format(lead.amount) }}</td>
+                <td>{{ lead.status }}</td>
+                <td>{{ lead.payment_status }}</td>
+                <td>{{ lead.conclusion }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="business-section">
+        <div class="panel-header">
+          <h2>Business list</h2>
+          <span class="chip neutral">{{ businesses|length }} onboarded</span>
+        </div>
+
+        <div class="business-grid">
+          {% for business in businesses %}
+          <article class="business-card">
+            <div class="business-topline">
+              <h3>{{ business.business_name }}</h3>
+              <span class="chip neutral">{{ business.category }}</span>
+            </div>
+            <p>{{ business.what_they_do }}</p>
+            <ul>
+              <li><strong>Type:</strong> {{ business.service_type }}</li>
+              <li><strong>Pricing:</strong> {{ business.pricing }}</li>
+              <li><strong>Bank:</strong> {{ business.bank_name }}</li>
+              <li><strong>Account:</strong> {{ business.account_number }}</li>
+            </ul>
+          </article>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>
