@@ -82,10 +82,16 @@ python app.py
 
 ### Access Points
 
-- **Landing Page**: http://localhost:5173
-- **API Server**: http://localhost:5000
-- **Dashboard**: http://localhost:5000 (or `/` route)
-- **API Docs**: http://localhost:5000/api/health
+| Interface | URL | Purpose | Use Case |
+|-----------|-----|---------|----------|
+| **Landing Page** | http://localhost:5173 | Marketing site | Production-facing (public) |
+| **Dashboard** | http://localhost:5000 | Admin panel | Development/testing (internal) |
+| **API Server** | http://localhost:5000 | Backend | WhatsApp bot engine |
+
+**Important:** 
+- 🎨 **Landing Page** (5173) = What goes to production
+- 📊 **Dashboard** (5000) = Internal testing tool only
+- 🤖 **WhatsApp Bot** = Silent, runs on backend API
 
 ## 📦 Packages
 

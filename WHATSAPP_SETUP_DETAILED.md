@@ -1,0 +1,362 @@
+# WhatsApp Cloud API Setup - Complete Step-by-Step Guide
+
+## What You Need to Get
+
+To connect FLOWA to WhatsApp, you need **3 things** from Meta:
+
+1. **Phone Number ID** - Identifies your business WhatsApp account
+2. **Access Token** - API key to authenticate requests
+3. **Webhook Token** - Security token you create
+
+---
+
+## 📋 Prerequisites
+
+- ✅ Facebook account (free)
+- ✅ Meta business account (free)
+- ✅ WhatsApp Business Account (free)
+- ✅ A phone number (for testing or production)
+
+---
+
+## Step-by-Step Setup Guide
+
+### STEP 1: Create Meta Business Account
+
+1. Go to: https://business.facebook.com
+2. Click **Create Account**
+3. Enter:
+   - Business name
+   - Email
+   - Business type
+4. Click **Create**
+
+✅ You now have a Meta Business Account
+
+---
+
+### STEP 2: Install WhatsApp App
+
+1. Go to: https://www.whatsapp.com/business/
+2. Download WhatsApp Business app (Android/iOS)
+3. Verify with **your phone number**
+4. Keep the app open on your phone
+
+✅ You now have WhatsApp Business installed
+
+---
+
+### STEP 3: Create App in Meta Developers Console
+
+1. Go to: https://developers.facebook.com/apps
+2. Click **My Apps** (top right)
+3. Click **Create App**
+4. Choose:
+   - **App type:** Business
+   - **App name:** "FLOWA Bot"
+   - **App purpose:** WhatsApp Bot / Customer Communication
+5. Click **Create App**
+
+✅ You now have a Developer App
+
+---
+
+### STEP 4: Add WhatsApp Product
+
+1. In your app dashboard, click **Products** (left menu)
+2. Search for **WhatsApp**
+3. Click **Set Up** next to WhatsApp
+
+✅ WhatsApp is now added to your app
+
+---
+
+### STEP 5: Get Phone Number ID
+
+**Method A: Test Phone (Quick - for development)**
+
+1. In WhatsApp settings, click **API Setup**
+2. Under "Test Phone," click **Add Phone Number**
+3. Enter:
+   - Phone number: Any test number (e.g., +1234567890)
+   - Business account: Select your account
+4. Verify with code you receive
+5. **Copy the Phone Number ID** (looks like: `102938573920857`)
+
+**Method B: Production Phone (Real business number)**
+
+1. Go to **Phone Numbers** tab
+2. Click **Add Phone Number**
+3. Verify number with code
+4. Link to WhatsApp Business Account
+5. **Copy the Phone Number ID**
+
+✅ You now have **Phone Number ID**
+
+```
+Example: 102938573920857
+```
+
+---
+
+### STEP 6: Generate Access Token
+
+1. Go to: https://developers.facebook.com/apps/
+2. Click your app → **Settings** → **Basic**
+3. Copy **App ID** and **App Secret**
+4. Go back to **WhatsApp** product
+5. Click **API Setup** → **Token**
+6. Click **Generate Access Token**
+7. Select:
+   - Business account
+   - Permissions: `whatsapp_business_messaging`
+   - Token expires: Never (or choose duration)
+8. Click **Generate Token**
+9. **Copy the Access Token** (long string starting with `EAAB...`)
+
+⚠️ **IMPORTANT:** 
+- Save this token somewhere safe
+- Never share it publicly
+- If leaked, regenerate immediately
+
+✅ You now have **Access Token**
+
+```
+Example: EAACc2ZBZC1s4BACZC1...
+```
+
+---
+
+### STEP 7: Create Webhook Token (You Create This)
+
+This is a security token **you make up** to verify webhook requests:
+
+```
+Your Webhook Token: flowa_webhook_secure_secret_2024
+```
+
+**Rules:**
+- Can be any string (letters, numbers, symbols)
+- At least 16 characters recommended
+- Keep it secret
+- You'll use it in two places:
+  1. Your `.env` file
+  2. Meta Developers Console
+
+✅ You now have **Webhook Token**
+
+---
+
+### STEP 8: Configure Webhook in Meta Console
+
+1. In WhatsApp product, go **Configuration**
+2. Scroll to **Webhook** section
+3. Click **Edit** or **Configure Webhook**
+4. Enter:
+   - **Webhook URL:** `https://your-domain.com/api/whatsapp/webhook`
+   - **Verify Token:** Your webhook token (from step 7)
+5. Subscribe to these events:
+   - ✅ `messages`
+   - ✅ `message_status`
+6. Click **Save**
+
+⚠️ **For Local Testing:**
+Use ngrok to expose your local server:
+```bash
+ngrok http 5000
+# Gives you: https://xxxx-xxx-xxx-xxx.ngrok.io
+
+# Use this as webhook URL:
+https://xxxx-xxx-xxx-xxx.ngrok.io/api/whatsapp/webhook
+```
+
+✅ Webhook is now configured
+
+---
+
+### STEP 9: Set Environment Variables in FLOWA
+
+1. Open `.env` file in `packages/api/`:
+
+```bash
+nano /home/biltronix/FLOWA/packages/api/.env
+```
+
+2. Add these credentials:
+
+```env
+WHATSAPP_PHONE_ID=102938573920857
+WHATSAPP_API_TOKEN=EAACc2ZBZC1s4BACZC1...
+WHATSAPP_WEBHOOK_TOKEN=flowa_webhook_secure_secret_2024
+FLASK_ENV=production
+DEBUG=False
+```
+
+3. Replace with **your actual values** from steps 5, 6, and 7
+
+4. Save the file (Ctrl+X, then Y)
+
+✅ Environment variables are now set
+
+---
+
+### STEP 10: Test the Connection
+
+```bash
+# Restart your Flask app
+cd /home/biltronix/FLOWA/packages/api
+source .venv/bin/activate
+python app.py
+```
+
+You should see:
+```
+ * Running on http://127.0.0.1:5000
+ * Webhook configured
+```
+
+✅ Connection is working!
+
+---
+
+## 🧪 Test with Real WhatsApp
+
+### Send a Test Message
+
+1. On your phone with WhatsApp Business open:
+2. Text your business number something like:
+   ```
+   Hi, I want a 10-inch chocolate cake
+   ```
+
+3. Check the response (should be auto-generated by FLOWA AI)
+
+4. Check dashboard at http://localhost:5000 to see the conversation
+
+✅ Live WhatsApp integration working!
+
+---
+
+## 📊 Dashboard After Setup
+
+Once configured, you'll see in the dashboard:
+
+- ✅ Customer messages arriving
+- ✅ AI responses being sent
+- ✅ Conversations logged
+- ✅ Order status updating
+- ✅ Payment tracking
+
+---
+
+## Quick Reference - Credentials You Need
+
+| Item | Where to Get | Format | Example |
+|------|--------------|--------|---------|
+| **Phone ID** | WhatsApp API Setup | Numbers | `102938573920857` |
+| **Access Token** | WhatsApp API Setup → Token | Long string | `EAACc2ZBZC1s4BA...` |
+| **Webhook Token** | You create it | Any string | `flowa_webhook_2024` |
+
+---
+
+## Credentials Location Code
+
+```python
+# packages/api/app.py (already configured)
+
+WHATSAPP_API_URL = "https://graph.instagram.com/v18.0"
+WHATSAPP_PHONE_ID = os.getenv("WHATSAPP_PHONE_ID")        # From step 5
+WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN")      # From step 6
+WHATSAPP_WEBHOOK_TOKEN = os.getenv("WHATSAPP_WEBHOOK_TOKEN") # From step 7
+```
+
+---
+
+## 🚀 FREE TIER LIMITS
+
+**Meta offers:**
+- ✅ Free testing with test numbers
+- ✅ First 1,000 messages/month FREE
+- ✅ Receiving messages is always free
+- ✅ Full API access with free tier
+
+After 1,000 messages:
+- $0.05 - $0.13 per message (varies by country)
+- Nigeria: ~₦80-200 per message
+
+---
+
+## ⚠️ Common Issues & Solutions
+
+| Issue | Solution |
+|-------|----------|
+| "404 Not Found" on webhook | Check webhook URL is publicly accessible |
+| "403 Forbidden" | Verify token doesn't match - check .env |
+| "Invalid Access Token" | Token expired or wrong - regenerate |
+| No messages received | Check webhook not yet verified by Meta |
+| Webhook times out | Make sure you're responding within 20 seconds |
+
+---
+
+## 🔐 Security Checklist
+
+- [ ] Access token is in `.env` (never in code)
+- [ ] `.env` file is in `.gitignore`
+- [ ] Webhook token is random and long
+- [ ] HTTPS enabled on production
+- [ ] Webhook IP whitelisted (if possible)
+- [ ] Rate limiting enabled
+- [ ] Webhook signature verification enabled
+
+---
+
+## 📞 If You Get Stuck
+
+**Common questions:**
+
+**Q: Do I need a real phone number?**
+A: For testing, use test numbers (provided). For production, use your real business number.
+
+**Q: How long does approval take?**
+A: Usually instant for testing. Production apps may take 1-3 days for review.
+
+**Q: Can I use personal WhatsApp?**
+A: No, must use WhatsApp Business Account.
+
+**Q: What if I lost my access token?**
+A: Regenerate in Meta Console → WhatsApp → Configuration → Token
+
+**Q: Is there a free tier?**
+A: Yes! First 1,000 messages/month free.
+
+---
+
+## 🎯 Once You Have Credentials
+
+```bash
+# Put them in .env
+cd /home/biltronix/FLOWA/packages/api
+cat > .env << 'EOF'
+WHATSAPP_PHONE_ID=YOUR_PHONE_ID
+WHATSAPP_API_TOKEN=YOUR_ACCESS_TOKEN
+WHATSAPP_WEBHOOK_TOKEN=YOUR_WEBHOOK_TOKEN
+EOF
+
+# Restart the app
+python app.py
+
+# Test with real WhatsApp!
+```
+
+---
+
+## 📚 Useful Links
+
+- **Meta Developers:** https://developers.facebook.com/
+- **WhatsApp API Docs:** https://developers.facebook.com/docs/whatsapp/cloud-api/
+- **Get Credentials:** https://developers.facebook.com/apps/
+- **Webhook Reference:** https://developers.facebook.com/docs/whatsapp/webhooks/
+
+---
+
+**You're all set!** Once you have those 3 credentials, your FLOWA bot is live on WhatsApp 🚀
