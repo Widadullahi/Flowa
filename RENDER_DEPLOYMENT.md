@@ -133,11 +133,14 @@ git push origin master
 3. **Configure**:
    - **Root Directory**: `packages/landing`
    - **Framework Preset**: Auto-detect (should recognize Vite + React)
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
+   - **Build Command**: `npm run build` (leave default)
+   - **Output Directory**: `dist` (very important - Vite outputs to dist, not public)
+   - **Install Command**: `npm install` (leave default)
 4. **Environment Variables**:
-   - `VITE_API_BASE_URL`: `https://flowa-api.onrender.com` (backend URL - copy your actual backend URL here)
+   - `VITE_API_BASE_URL`: `https://flowa-api.onrender.com` (your Render backend URL)
 5. **Deploy**: Click "Deploy"
+
+> **Note**: The `vercel.json` in `packages/landing/` contains these settings. If Vercel auto-detects incorrectly, manually set Output Directory to `dist`.
 
 Once deployed, you can access the frontend at: `https://<your-vercel-project>.vercel.app`
 
@@ -307,6 +310,20 @@ curl https://flowa-api.onrender.com/api/businesses
 
 2. **Check API URL**:
    - Frontend `.env` should have `VITE_API_BASE_URL=https://flowa-api.onrender.com`
+
+### Vercel build fails: "No Output Directory named public found"
+
+**Error**: Build failed looking for "public" output directory
+
+**Fix**:
+1. Go to Vercel project settings
+2. Find "Build & Development Settings"
+3. Set **Output Directory** to: `dist` (not public)
+4. Or let Vercel auto-detect from `vercel.json` in `packages/landing/`
+
+The issue occurs when Vercel tries to build the root instead of `packages/landing`. Make sure:
+- **Root Directory** is set to `packages/landing`
+- **Output Directory** is `dist` (Vite's default output)
 
 ---
 
