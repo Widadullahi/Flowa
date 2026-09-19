@@ -53,7 +53,7 @@ This guide walks you through deploying FLOWA to Render: backend API on Render, f
    - **Environment**: Select `Python 3`
    - **Region**: Choose closest to your users (e.g., Frankfurt, Singapore)
    - **Branch**: `master`
-   - **Root Directory**: `packages/api` (Render will look for `requirements.txt` here)
+   - **Root Directory**: `packages/api` ← **⚠️ IMPORTANT: Include `packages/` prefix** (Render will look for `requirements.txt` here)
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `gunicorn -w 4 -b 0.0.0.0:$PORT app:app`
    - **Plan**: Free tier fine for testing; upgrade to Starter ($7/month) for production
@@ -254,6 +254,17 @@ curl https://flowa-api.onrender.com/api/businesses
    curl -v "https://flowa-api.onrender.com/api/whatsapp/webhook?hub.mode=subscribe&hub.challenge=test&hub.verify_token=YOUR_TOKEN"
    ```
 
+### Root directory does not exist
+
+**Error**: `Root directory "api" does not exist`
+
+**Fix**:
+1. Go to Render dashboard → Service settings
+2. Find **Root Directory** field
+3. Change from `api` to `packages/api` (include the `packages/` prefix)
+4. Click **Save settings**
+5. Render will automatically rebuild
+
 ### Backend crashes on startup
 
 1. **Check logs**:
@@ -261,6 +272,7 @@ curl https://flowa-api.onrender.com/api/businesses
    - Common issues:
      - Missing `WHATSAPP_API_TOKEN` (check env vars)
      - Missing `gunicorn` in requirements.txt
+     - Wrong root directory (see above)
 
 2. **Rebuild**:
    - Manual redeploy: Dashboard → Service → Manual deploy
