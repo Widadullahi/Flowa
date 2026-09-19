@@ -135,9 +135,11 @@ git push origin master
    - **Framework Preset**: Auto-detect (should recognize Vite + React)
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
-4. **Environment Variables** (if needed):
-   - `VITE_API_BASE_URL`: `https://flowa-api.onrender.com` (backend URL)
+4. **Environment Variables**:
+   - `VITE_API_BASE_URL`: `https://flowa-api.onrender.com` (backend URL - copy your actual backend URL here)
 5. **Deploy**: Click "Deploy"
+
+Once deployed, you can access the frontend at: `https://<your-vercel-project>.vercel.app`
 
 ### 2.2 Alternative: Deploy to Netlify
 
@@ -173,7 +175,21 @@ curl https://flowa-api.onrender.com/api/health
 
 Expected: `{"status": "ok", "timestamp": "2026-09-19T..."}`
 
-### 4.2 Test WhatsApp Webhook
+### 4.2 Dashboard Access
+
+Visit your deployed dashboard:
+```
+https://flowa-api.onrender.com/
+```
+
+This shows the business management interface with:
+- Business onboarding form
+- AI chat simulator
+- Leads summary report
+- Business listing
+- Dark mode toggle (top-right)
+
+### 4.3 Test WhatsApp Webhook
 
 ```bash
 curl -X POST https://flowa-api.onrender.com/api/whatsapp/test \
