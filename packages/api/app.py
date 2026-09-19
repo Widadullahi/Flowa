@@ -6,25 +6,52 @@ import os
 import re
 from datetime import datetime, timedelta, timezone
 from typing import Any
+import json
 
 import requests
 from flask import Flask, jsonify, make_response, render_template, request
+from cryptography.fernet import Fernet, InvalidToken
+from typing import Optional
 
 app = Flask(__name__)
 
 # WhatsApp Configuration
-WHATSAPP_API_URL = "https://graph.instagram.com/v18.0"
+WHATSAPP_API_URL = os.getenv("WHATSAPP_API_URL", "https://graph.instagram.com/v18.0")
 WHATSAPP_PHONE_ID = os.getenv("WHATSAPP_PHONE_ID", "YOUR_PHONE_ID")
 WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN", "YOUR_API_TOKEN")
 WHATSAPP_WEBHOOK_TOKEN = os.getenv("WHATSAPP_WEBHOOK_TOKEN", "flowa_webhook_secret_123")
 
+# Master key used to encrypt per-business credentials. Must be a Fernet key (urlsafe base64 32-byte).
+MASTER_KEY = os.getenv("MASTER_KEY")
 
-def send_whatsapp_message(phone_number: str, message: str) -> bool:
-    """Send a message via WhatsApp API"""
+
+def _get_fernet() -> Optional[Fernet]:
+    if not MASTER_KEY:
+        print("WARNING: MASTER_KEY not set. Per-business credentials will be stored in-memory unencrypted for this session only.")
+        return None
     try:
-        url = f"{WHATSAPP_API_URL}/{WHATSAPP_PHONE_ID}/messages"
+        return Fernet(MASTER_KEY.encode())
+    except Exception as e:
+        print(f"Invalid MASTER_KEY provided: {e}")
+        return None
+
+
+def send_whatsapp_message(phone_number: str, message: str, business_id: Optional[str] = None) -> bool:
+    """Send a message via WhatsApp API. If `business_id` has credentials stored, use them."""
+    try:
+        phone_id = WHATSAPP_PHONE_ID
+        token = WHATSAPP_API_TOKEN
+
+        # If business-specific credentials exist, use them
+        if business_id:
+            creds = store.get_whatsapp_credentials(business_id)
+            if creds:
+                phone_id = creds.get("phone_id") or phone_id
+                token = creds.get("api_token") or token
+
+        url = f"{WHATSAPP_API_URL}/{phone_id}/messages"
         headers = {
-            "Authorization": f"Bearer {WHATSAPP_API_TOKEN}",
+            "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
         }
         payload = {
@@ -34,6 +61,8 @@ def send_whatsapp_message(phone_number: str, message: str) -> bool:
             "text": {"body": message},
         }
         response = requests.post(url, json=payload, headers=headers, timeout=10)
+        if response.status_code >= 400:
+            print(f"WhatsApp send failed: {response.status_code} - {response.text}")
         return response.status_code == 200
     except Exception as e:
         print(f"WhatsApp send error: {e}")
@@ -246,6 +275,43 @@ class FlowaStore:
                 "created_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S"),
             },
         ]
+
+        # In-memory encrypted per-business WhatsApp credential storage.
+        # Structure: { business_id: encrypted_bytes }
+        self._whatsapp_creds: dict[str, bytes] = {}
+
+    # --- WhatsApp credential storage helpers ---
+    def set_whatsapp_credentials(self, business_id: str, creds: dict[str, Any]) -> None:
+        """Encrypt and store credentials for a business.
+
+        creds should contain keys: phone_id, api_token, webhook_verify_token (optional)
+        """
+        f = _get_fernet()
+        raw = json.dumps(creds).encode()
+        if f:
+            token = f.encrypt(raw)
+            self._whatsapp_creds[business_id] = token
+        else:
+            # fallback: store plaintext bytes (only for local testing)
+            self._whatsapp_creds[business_id] = raw
+
+    def get_whatsapp_credentials(self, business_id: str) -> dict[str, Any] | None:
+        data = self._whatsapp_creds.get(business_id)
+        if not data:
+            return None
+        f = _get_fernet()
+        try:
+            if f:
+                dec = f.decrypt(data)
+            else:
+                dec = data
+            return json.loads(dec.decode())
+        except InvalidToken:
+            print("Failed to decrypt credentials: invalid token")
+            return None
+        except Exception as e:
+            print(f"Failed to parse credentials: {e}")
+            return None
         self.leads: list[dict[str, Any]] = [
             {
                 "id": "lead_2001",

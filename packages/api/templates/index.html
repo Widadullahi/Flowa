@@ -3,43 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flowa MVP</title>
+    <title>Flowa - WhatsApp Business Management</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
   </head>
   <body>
+    <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
+
     <div class="page-shell">
       <header class="topbar">
         <div class="brand-block">
-          <div class="brand-mark">F</div>
+          <div class="brand-mark">⚡</div>
           <div>
             <div class="brand-name">Flowa</div>
             <div class="brand-tag">From conversation to completion</div>
           </div>
         </div>
         <div class="top-pills">
-          <span class="chip success">WhatsApp-first</span>
-          <span class="chip neutral">AI + Paystack-ready</span>
+          <span class="chip success">💬 WhatsApp-first</span>
+          <span class="chip neutral">🤖 AI-powered</span>
+          <span class="chip neutral">💳 Paystack-ready</span>
         </div>
       </header>
 
       <section class="stats-row">
         <div class="stat-card accent">
-          <label>Businesses</label>
+          <label>📊 Businesses</label>
           <strong>{{ summary.total_businesses }}</strong>
         </div>
         <div class="stat-card">
-          <label>Active leads</label>
+          <label>🔥 Active leads</label>
           <strong>{{ summary.active_leads }}</strong>
         </div>
         <div class="stat-card">
-          <label>Paid</label>
+          <label>✅ Paid</label>
           <strong>{{ summary.paid_leads }}</strong>
         </div>
         <div class="stat-card">
-          <label>Pending</label>
+          <label>⏳ Pending</label>
           <strong>{{ summary.total_businesses + summary.active_leads - summary.paid_leads }}</strong>
         </div>
       </section>
@@ -47,7 +50,7 @@
       <section class="main-grid">
         <div class="panel">
           <div class="panel-header">
-            <h2>Business onboarding</h2>
+            <h2>📝 Business onboarding</h2>
             <span class="chip neutral">On WhatsApp</span>
           </div>
 
@@ -137,8 +140,8 @@
 
         <div class="panel">
           <div class="panel-header">
-            <h2>Customer AI chat</h2>
-            <span class="chip success">Demo</span>
+            <h2>💭 Customer AI chat</h2>
+            <span class="chip success">Live</span>
           </div>
 
           <div class="stack-form">
@@ -174,8 +177,8 @@
 
       <section class="panel report-panel">
         <div class="panel-header">
-          <h2>Summary report</h2>
-          <a href="/api/reports/export" class="download-link">Download CSV</a>
+          <h2>📈 Summary report</h2>
+          <a href="/api/reports/export" class="download-link">⬇️ Download CSV</a>
         </div>
 
         <div class="table-wrap">
@@ -210,7 +213,7 @@
 
       <section class="business-section">
         <div class="panel-header">
-          <h2>Business list</h2>
+          <h2>🏪 Business list</h2>
           <span class="chip neutral">{{ businesses|length }} onboarded</span>
         </div>
 
